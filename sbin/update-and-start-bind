@@ -53,10 +53,12 @@ if [[ -e "${BIND_CONF_LOCAL_FILE}" ]]; then
     sed -i "/listen-on-v6/ a forwarders { ${FORWARDERS} };" "${BIND_CONF_OPTIONS_FILE}"
     # Disable ipv6
     sed -i 's|listen-on-v6|//listen-on-v6|' "${BIND_CONF_OPTIONS_FILE}"
+    sed -i 's/"-u bind"/"-u bind -4"/' '/etc/default/named'
     # Format new lines
     sed -i "s/tkey-gssapi-keytab/        tkey-gssapi-keytab/" "${BIND_CONF_OPTIONS_FILE}"
     sed -i "s/minimal-responses/        minimal-responses/" "${BIND_CONF_OPTIONS_FILE}"
     sed -i "s/forwarders/        forwarders/" "${BIND_CONF_OPTIONS_FILE}"
+    
   fi
 
   # Start named service
