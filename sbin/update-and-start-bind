@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+# Exit if any error
+set -euo pipefail
+
+SAMBA_PATH="${SAMBA_PATH:-/usr/local/samba}"
+FORWARDERS="$(echo "${DNS_FORWARDERS}" | sed 's/ /; /');"
+
+# If /etc/named.conf exists, config Alma/Rocky
+BIND_CONF_FILE='/etc/named.conf'
+if [[ -e "${BIND_CONF_FILE}" ]]; then
+
+  # Skip update if bind-dns is found inside file
+  if ! grep -q bind-dns "${BIND_CONF_FILE}"; then
+
+    # Samba required lines
+    echo "include \"${SAMBA_PATH}/bind-dns/named.conf\";" >>"${BIND_CONF_FILE}"
+    sed -i "/allow-query/ a tkey-gssapi-keytab \"${SAMBA_PATH}/private/dns.keytab\";" "${BIND_CONF_FILE}"
+    sed -i "/allow-query/ a minimal-responses yes;" "${BIND_CONF_FILE}"
+    # Listen and allow queries from any
+    sed -i 's/127.0.0.1;/any;/g' "${BIND_CONF_FILE}"
+    sed -i 's/localhost;/any;/g' "${BIND_CONF_FILE}"
+    # Disable ipv6
+    sed -i 's|listen-on-v6|//listen-on-v6|' "${BIND_CONF_FILE}"
+    # Add forwarders
+    sed -i "/allow-query/ a forwarders { ${FORWARDERS} };" "${BIND_CONF_FILE}"
+    # Format new lines
+    sed -i "s/tkey-gssapi-keytab/        tkey-gssapi-keytab/" "${BIND_CONF_FILE}"
+    sed -i "s/minimal-responses/        minimal-responses/" "${BIND_CONF_FILE}"
+    sed -i "s/forwarders/        forwarders/" "${BIND_CONF_FILE}"
+
+  fi
+
+  # Start named service
+  named -u named
+
+fi
+unset BIND_CONF_FILE
+
+# If /etc/bind/named.conf.local exists, config Debian/Ubuntu
+BIND_CONF_LOCAL_FILE='/etc/bind/named.conf.local'
+if [[ -e "${BIND_CONF_LOCAL_FILE}" ]]; then
+
+  # Skip update if bind-dns is found inside file
+  if ! grep -q bind-dns "${BIND_CONF_LOCAL_FILE}"; then
+
+    # Samba required lines
+    echo "include \"${SAMBA_PATH}/bind-dns/named.conf\";" >>"${BIND_CONF_LOCAL_FILE}"
+    BIND_CONF_OPTIONS_FILE='/etc/bind/named.conf.options'
+    sed -i "/listen-on-v6/ a tkey-gssapi-keytab \"${SAMBA_PATH}/private/dns.keytab\";" "${BIND_CONF_OPTIONS_FILE}"
+    sed -i "/listen-on-v6/ a minimal-responses yes;" "${BIND_CONF_OPTIONS_FILE}"
+    # Add forwarders
+    sed -i "/listen-on-v6/ a forwarders { ${FORWARDERS} };" "${BIND_CONF_OPTIONS_FILE}"
+    # Disable ipv6
+    sed -i 's|listen-on-v6|//listen-on-v6|' "${BIND_CONF_OPTIONS_FILE}"
+    # Format new lines
+    sed -i "s/tkey-gssapi-keytab/        tkey-gssapi-keytab/" "${BIND_CONF_OPTIONS_FILE}"
+    sed -i "s/minimal-responses/        minimal-responses/" "${BIND_CONF_OPTIONS_FILE}"
+    sed -i "s/forwarders/        forwarders/" "${BIND_CONF_OPTIONS_FILE}"
+  fi
+
+  # Start named service
+  named
+
+fi

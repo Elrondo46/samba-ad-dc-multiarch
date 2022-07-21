@@ -47,6 +47,7 @@ services:
       REALM: DGS.NET
       DOMAIN: DGS
       ADMIN_PASS: Passw0rd
+      DNS_BACKEND: BIND9_DLZ
       DNS_FORWARDERS: 8.8.8.8
       BIND_NETWORK_INTERFACES: false
     command: bash -c "
@@ -110,6 +111,7 @@ services:
       REALM: DGS.NET
       DOMAIN: DGS
       ADMIN_PASS: Passw0rd
+      DNS_BACKEND: BIND9_DLZ
       DNS_FORWARDERS: 8.8.8.8
       BIND_NETWORK_INTERFACES: false
     command: bash -c "
