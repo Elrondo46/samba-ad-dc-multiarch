@@ -11,19 +11,56 @@ done
 
 SERVER_IP=$(ip a | grep 'scope global' | head -n1 | awk '{print $2}' | awk -F / '{print $1}')
 SEARCH_DOMAIN=$(echo "${REALM}" | tr [:upper:] [:lower:])
+SAMBA_PATH="${SAMBA_PATH:-/usr/local/samba}"
+DNS_BACKEND="${DNS_BACKEND:-SAMBA_INTERNAL}"
 
-# Change resolv.conf based on current network info
+# Update resolv.conf based on current network info
 if ! grep -q "${SEARCH_DOMAIN}" /etc/resolv.conf; then
   echo -e "search ${SEARCH_DOMAIN}\nnameserver ${SERVER_IP}" >/etc/resolv.conf
 fi
 
-# Change /etc/hosts file with current hostname and domain
+# Update /etc/hosts file with current hostname and domain
 if ! grep -q "${SEARCH_DOMAIN}" /etc/hosts; then
   echo -e "${SERVER_IP} $(hostname).${SEARCH_DOMAIN} $(hostname)" >>/etc/hosts
 fi
 
-# Change krb5 file with compiled files
+# Update krb5 file with compiled files
 if ! grep -q "${SEARCH_DOMAIN}" /etc/krb5.conf; then
-  # The krb5.conf location is different from mirror and compiled from source files
-  cat "${SAMBA_PATH:-/usr/local/samba}/private/krb5.conf" >/etc/krb5.conf
+  cat "${SAMBA_PATH}/private/krb5.conf" >/etc/krb5.conf
+fi
+
+# BIND9_DLZ as DNS_BACKEND config
+if [[ "${DNS_BACKEND}" == 'BIND9_DLZ' ]]; then
+
+  # If /etc/named.conf exists, config Alma/Rocky
+  BIND_CONFIG_FILE='/etc/named.conf'
+  if [[ -e "${BIND_CONFIG_FILE}" ]]; then
+
+    # Skip named.conf update if bind-dns is found
+    if ! grep -q bind-dns "${BIND_CONFIG_FILE}"; then
+
+      # Samba required lines
+      echo "include \"${SAMBA_PATH}/bind-dns/named.conf\";" >>"${BIND_CONFIG_FILE}"
+      sed -i "/allow-query/ a tkey-gssapi-keytab \"${SAMBA_PATH}/private/dns.keytab\";" "${BIND_CONFIG_FILE}"
+      sed -i "/allow-query/ a minimal-responses yes;" "${BIND_CONFIG_FILE}"
+      # Listen and allow queries from any
+      sed -i 's/127.0.0.1;/any;/g' "${BIND_CONFIG_FILE}"
+      sed -i 's/localhost;/any;/g' "${BIND_CONFIG_FILE}"
+      # Disable ipv6
+      sed -i 's|listen-on-v6|//listen-on-v6|' "${BIND_CONFIG_FILE}"
+      # Add forwarders
+      FORWARDERS="$(echo "${DNS_FORWARDERS}" | sed 's/ /; /');"
+      sed -i "/allow-query/ a forwarders { ${FORWARDERS} };" "${BIND_CONFIG_FILE}"
+      # Format new lines
+      sed -i "s/tkey-gssapi-keytab/        tkey-gssapi-keytab/" "${BIND_CONFIG_FILE}"
+      sed -i "s/minimal-responses/        minimal-responses/" "${BIND_CONFIG_FILE}"
+      sed -i "s/forwarders/        forwarders/" "${BIND_CONFIG_FILE}"
+
+    fi
+
+    # Start named service
+    named -u named
+
+  fi 
+
 fi

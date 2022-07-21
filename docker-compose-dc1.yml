@@ -15,7 +15,8 @@ services:
       REALM: DGS.NET
       DOMAIN: DGS
       ADMIN_PASS: Passw0rd
-      DNS_FORWARDER: 8.8.8.8
+      DNS_FORWARDERS: 8.8.8.8
+      DNS_BACKEND: BIND9_DLZ
     volumes:
       - dc1-local-samba:/usr/local/samba
 

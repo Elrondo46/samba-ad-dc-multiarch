@@ -16,6 +16,7 @@ if [[ ! -e "${SAMBA_PATH:-/usr/local/samba}/private/secrets.keytab" ]]; then
     sleep 1
   done
   INTERFACE=$(ip a | grep BROADCAST | head -n1 | awk '{print $2}' | sed 's/://')
+  DNS_BACKEND="${DNS_BACKEND:-SAMBA_INTERNAL}"
 
   # Always bind interfaces, but not in tests
   if [[ "${BIND_NETWORK_INTERFACES:-true}" == true ]]; then
@@ -24,8 +25,8 @@ if [[ ! -e "${SAMBA_PATH:-/usr/local/samba}/private/secrets.keytab" ]]; then
       --server="${server}" \
       --username=administrator \
       --password="${ADMIN_PASS}" \
-      --dns-backend="${DNS_BACKEND:-SAMBA_INTERNAL}" \
-      --option="dns forwarder=${DNS_FORWARDER}" \
+      --dns-backend="${DNS_BACKEND}" \
+      --option="dns forwarder=${DNS_FORWARDERS}" \
       --option="interfaces=lo ${INTERFACE}" \
       --option="bind interfaces only=yes"
 
@@ -35,8 +36,8 @@ if [[ ! -e "${SAMBA_PATH:-/usr/local/samba}/private/secrets.keytab" ]]; then
       --server="${server}" \
       --username=administrator \
       --password="${ADMIN_PASS}" \
-      --dns-backend="${DNS_BACKEND:-SAMBA_INTERNAL}" \
-      --option="dns forwarder=${DNS_FORWARDER}"
+      --dns-backend="${DNS_BACKEND}" \
+      --option="dns forwarder=${DNS_FORWARDERS}"
 
   fi
 

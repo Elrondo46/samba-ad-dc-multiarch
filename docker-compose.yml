@@ -14,7 +14,8 @@ services:
       REALM: DGS.NET
       DOMAIN: DGS
       ADMIN_PASS: Passw0rd
-      DNS_FORWARDER: 8.8.8.8
+      DNS_BACKEND: BIND9_DLZ
+      DNS_FORWARDERS: 8.8.8.8
       BIND_NETWORK_INTERFACES: false
     command: bash -c "
       set -x &&
@@ -46,7 +47,7 @@ services:
       REALM: DGS.NET
       DOMAIN: DGS
       ADMIN_PASS: Passw0rd
-      DNS_FORWARDER: 8.8.8.8
+      DNS_FORWARDERS: 8.8.8.8
       BIND_NETWORK_INTERFACES: false
     command: bash -c "
       set -x &&
@@ -77,7 +78,8 @@ services:
       REALM: DGS.NET
       DOMAIN: DGS
       ADMIN_PASS: Passw0rd
-      DNS_FORWARDER: 8.8.8.8
+      DNS_BACKEND: BIND9_DLZ
+      DNS_FORWARDERS: 8.8.8.8
       BIND_NETWORK_INTERFACES: false
     command: bash -c "
       set -x &&
@@ -108,7 +110,7 @@ services:
       REALM: DGS.NET
       DOMAIN: DGS
       ADMIN_PASS: Passw0rd
-      DNS_FORWARDER: 8.8.8.8
+      DNS_FORWARDERS: 8.8.8.8
       BIND_NETWORK_INTERFACES: false
     command: bash -c "
       set -x &&
