@@ -11,8 +11,6 @@ done
 
 SERVER_IP=$(ip a | grep 'scope global' | head -n1 | awk '{print $2}' | awk -F / '{print $1}')
 SEARCH_DOMAIN=$(echo "${REALM}" | tr [:upper:] [:lower:])
-SAMBA_PATH="${SAMBA_PATH:-/usr/local/samba}"
-DNS_BACKEND="${DNS_BACKEND:-SAMBA_INTERNAL}"
 
 # Update resolv.conf based on current network info
 if ! grep -q "${SEARCH_DOMAIN}" /etc/resolv.conf; then
@@ -26,8 +24,8 @@ fi
 
 # Update krb5 file with compiled files
 if ! grep -q "${SEARCH_DOMAIN}" /etc/krb5.conf; then
-  cat "${SAMBA_PATH}/private/krb5.conf" >/etc/krb5.conf
+  cat "${SAMBA_PATH:-/usr/local/samba}/private/krb5.conf" >/etc/krb5.conf
 fi
 
 # Configure bind files and start service for BIND9_DLZ as DNS_BACKEND
-if [[ "${DNS_BACKEND}" == 'BIND9_DLZ' ]]; then update-and-start-bind; fi
+if [[ "${DNS_BACKEND:-SAMBA_INTERNAL}" == 'BIND9_DLZ' ]]; then update-and-start-bind; fi
