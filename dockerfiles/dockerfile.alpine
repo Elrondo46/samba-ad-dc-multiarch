@@ -39,7 +39,7 @@ RUN apk --update add \
 	libtirpc-dev \
 	py3-markdown \
 	bison \
-	perl-json \
+	perl-json && \
 iproute netcat -y && \
 apk cache clean
 
