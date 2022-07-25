@@ -1,7 +1,7 @@
 FROM alpine:edge
 
 RUN apk --update add \
-      docbook-xsl \
+        docbook-xsl \
 	gcc \
 	gdb \
 	gnutls-dev \
@@ -39,9 +39,11 @@ RUN apk --update add \
 	libtirpc-dev \
 	py3-markdown \
 	bison \
-	perl-json && \
-iproute netcat -y && \
-apk cache clean
+	perl-json
+   
+RUN iproute netcat -y
+
+RUN apk cache clean
 
 ENV SMB_VERSION latest
 ENV PATH /usr/local/samba/bin:/usr/local/samba/sbin:$PATH
