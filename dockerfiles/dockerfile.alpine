@@ -6,6 +6,7 @@ RUN apk update
 
 RUN apk add \
         docbook-xsl \
+	build-base \
 	gcc \
 	gdb \
 	gnutls-dev \
