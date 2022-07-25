@@ -46,8 +46,6 @@ RUN apk add \
 	netcat-openbsd \
 	bison \
 	perl-json
-   
-RUN apk cache clean
 
 ENV SMB_VERSION latest
 ENV PATH /usr/local/samba/bin:/usr/local/samba/sbin:$PATH
