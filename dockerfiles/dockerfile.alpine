@@ -42,11 +42,11 @@ RUN apk add \
 	dbus-dev \
 	libtirpc-dev \
 	py3-markdown \
+	iproute2 \
+	netcat-openbsd \
 	bison \
 	perl-json
    
-RUN iproute netcat -y
-
 RUN apk cache clean
 
 ENV SMB_VERSION latest
