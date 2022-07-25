@@ -16,6 +16,7 @@ RUN apk add \
 	krb5 \
 	acl-dev \
 	curl \
+	gettext-dev \
 	libaio-dev \
 	libarchive-dev \
 	attr-dev \
