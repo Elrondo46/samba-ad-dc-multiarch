@@ -1,0 +1,68 @@
+FROM alpine:edge
+
+RUN apk --update add \
+      docbook-xsl
+	gcc \
+	gdb \
+	gnutls-dev \
+	gpgme-dev \
+	jansson-dev \
+	keyutils-dev \
+	krb5 \
+	acl-dev \
+	libaio-dev \
+	libarchive-dev \
+	attr-dev \
+	blkid \
+	libtasn1 \
+	libtasn1-progs \
+	libxml2-dev \
+	libxslt \
+	lmdb-dev \
+	openldap-dev \
+	linux-pam-dev \
+	perl \
+	perl-extutils-makemaker \
+	perl-parse-yapp \
+	popt-dev \
+	py3-cryptography \
+	py3-dnslib \
+	py3-gpgme \
+	python3-dev \
+	readline-dev \
+	rpcgen \
+	tar \
+	zlib-dev \
+	bind-tools \
+	flex \
+	dbus-dev \
+	libtirpc-dev \
+	py3-markdown \
+	bison \
+	perl-json \
+iproute netcat -y && \
+apk cache clean
+
+ENV SMB_VERSION latest
+ENV PATH /usr/local/samba/bin:/usr/local/samba/sbin:$PATH
+ENV LC_CTYPE C.UTF-8
+ENV LC_MESSAGES C.UTF-8
+ENV LC_ALL C.UTF-8
+
+WORKDIR /usr/local/src/
+RUN curl -O https://download.samba.org/pub/samba/samba-$SMB_VERSION.tar.gz && \
+  mkdir samba && \
+  tar zxvf samba-$SMB_VERSION.tar.gz -C samba --strip-components=1 && \
+  rm -rf samba-$SMB_VERSION.tar.gz
+
+WORKDIR /usr/local/src/samba/
+RUN ./configure && \
+  make -j 3 && \
+  make install && \
+  rm -rf /usr/local/src/samba
+
+WORKDIR /usr/local/sbin
+COPY sbin /usr/local/sbin
+CMD bash -c "samba-domain-provision && samba -F"
+VOLUME /usr/local/samba
+EXPOSE 53 53/udp 88 88/udp 123/udp 135 137/udp 138/udp 139 389 389/udp 445 464 464/udp 636 3268 3269 49152-65535
