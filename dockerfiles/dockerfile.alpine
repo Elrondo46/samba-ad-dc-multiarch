@@ -14,6 +14,7 @@ RUN apk add \
 	keyutils-dev \
 	krb5 \
 	acl-dev \
+	curl \
 	libaio-dev \
 	libarchive-dev \
 	attr-dev \
