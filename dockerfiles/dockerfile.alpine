@@ -21,7 +21,8 @@ RUN apk --update add \
 	lmdb-dev \
 	openldap-dev \
 	linux-pam-dev \
-	perl \
+	
+RUN apk --update add	perl \
 	perl-extutils-makemaker \
 	perl-parse-yapp \
 	popt-dev \
