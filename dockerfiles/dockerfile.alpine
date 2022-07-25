@@ -1,6 +1,8 @@
 FROM alpine:edge
 
-RUN apk --update add \
+RUN apk update
+
+RUN apk add \
         docbook-xsl \
 	gcc \
 	gdb \
@@ -21,8 +23,7 @@ RUN apk --update add \
 	lmdb-dev \
 	openldap-dev \
 	linux-pam-dev \
-	
-RUN apk --update add	perl \
+	perl \
 	perl-extutils-makemaker \
 	perl-parse-yapp \
 	popt-dev \
