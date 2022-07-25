@@ -35,6 +35,7 @@ RUN apk add \
 	py3-dnslib \
 	py3-gpgme \
 	python3-dev \
+	py3-dnspython \
 	readline-dev \
 	rpcgen \
 	tar \
