@@ -1,7 +1,7 @@
 FROM alpine:edge
 
 RUN apk --update add \
-      docbook-xsl
+      docbook-xsl \
 	gcc \
 	gdb \
 	gnutls-dev \
